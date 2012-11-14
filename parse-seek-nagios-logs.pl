@@ -16,11 +16,13 @@ my $seek     = 1;                       # We're 'seeking' by default (seeking fr
 my $file     = '/var/log/nagios3/nagios.log';
 my $help     = 0;
 my $reset    = 0;                       # --reset|r will reset the seek position to "first run"
+my $pretty   = 0;
 my $messages = 0;                       # We're not printing 'messages ($5)' from Nagios log, unless --messages|m is passed
 
 GetOptions( 'seek!'     => \$seek,      # 'seek position' will be 0 if --noseek is passed, new seek position is not saved
             'file=s'    => \$file,
             'reset'     => \$reset,     # 'reset' starts seek at '0' and saves new seek position
+            'pretty'    => \$pretty,    # prints a 'human-readable' timestamp
             'messages!' => \$messages,
             'help'      => \$help);
 
@@ -80,6 +82,7 @@ sub parse_log {
             $info      = $3;
             $message   = $4 || '';
             ($host,$state,$service) = parse_bits($msg_type, (split ';', $info) );
+            $timestamp = pretty_timestamp($timestamp) if $pretty;
             print $timestamp,"\t",$msg_type,"\t",$host,"\t",$state,"\t",$service,"\t";#,$status,"\t",$info;
             print "\t",$info;
             print "\t",$message if $messages;
@@ -92,7 +95,18 @@ sub parse_log {
     close $LOG_FILE;
 }
 
-
+sub pretty_timestamp {
+    my $ts = shift;
+    my ($sec, $min, $hr, $day, $mon, $year) = gmtime($ts);
+    $mon +=1;
+    $year +=1900;
+    $mon = '0'.$mon if $mon < 10;
+    $day = '0'.$day if $day < 10;
+    $hr  = '0'.$hr if $hr < 10;
+    $min = '0'.$min if $min < 10;
+    $sec = '0'.$sec if $sec < 10;
+    return "$mon/$day/$year $hr:$min:$sec";
+}
 
 
 
@@ -163,6 +177,7 @@ sub usage {
     print "\t--reset | -r        Reset starting 'read' position to 0 and save new 'last read' position of log file\n\n";
     print "\t--messages | -m     We're not printing extended Nagios message by default. Using this flag will output\n";
     print "\t                    the extended message(s)\n\n";
+    print "\t--pretty | -p       Print the timestamp as a human-readable date/time\n\n";
     print "\t--help | -h         Print this help message\n\n";
     exit;
 }
