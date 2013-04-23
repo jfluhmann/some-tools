@@ -19,11 +19,11 @@ JMXPORT='1099'
 JMXCREDS='-'
 
 JMXCLIENT_VERSION='0.10.3'
-JMXCLIENT="cmdline-jmxclient-${JMXCLIENT_VERSION}.jar"
+JMXCLIENT="$NAGIOS_PLUGINS/cmdline-jmxclient-${JMXCLIENT_VERSION}.jar"
 JMXCLIENT_URL="http://crawler.archive.org/cmdline-jmxclient/$JMXCLIENT"
-GREP='/bin/grep'
-ECHO='/bin/echo'
-JAVA=`which java`
+GREP=$(which grep)
+ECHO=$(which echo)
+JAVA=$(which java)
 
 if [ -z "$JAVA" ]
 then
@@ -39,11 +39,10 @@ fi
 if [ ! -d "$NAGIOS_PLUGINS" ]; then
     echo "JMX CRITICAL - $NAGIOS_PLUGINS not found (you may need to set NAGIOS_PLUGIN to appropriate value)"
     exit $STATE_CRITICAL
-elif [ ! -e "$NAGIOS_PLUGINS/$JMXCLIENT" ]; then
+elif [ ! -e "$JMXCLIENT" ]; then
     #cd $NAGIOS_PLUGINS
     #wget -q $JMXCLIENT_URL
     #curl -O $JMXCLIENT_URL
-    #mv $JMXCLIENT $NAGIOS_PLUGINS/$JMXCLIENT
     echo; echo "You need to download the jmxclient from $JMXCLIENT_URL"
     echo "and put it in $NAGIOS_PLUGINS (or wherever your Nagios plugins are located, and "
     echo "set NAGIOS_PLUGINS in this script to that directory)"; echo
@@ -75,10 +74,10 @@ done
 [[ -z "$EXPECTRESULT" ]] && usage
 [[ "$JMXUSER" ]] && [[ "$JMXPASS" ]] && JMXCREDS="$JMXUSER:$JMXPASS"
 
-URL="service:jmx:rmi:///jndi/rmi://${JMXHOST}:${JMXPORT}/jmxrmi"
+# Grab Full Object
+JMXOBJECT=$($JAVA -jar $JMXCLIENT $JMXCREDS $JMXHOST:$JMXPORT 2>&1 | grep $JMXOBJECT)
 
-CMD_TMPL="$JAVA -jar $JMXCLIENT $JMXCREDS $JMXHOST:$JMXPORT $JMXOBJECT $JMXATTRIBUTE"
-RESULT=$($CMD_TMPL 2>&1 | $GREP $JMXATTRIBUTE)
+RESULT=$($JAVA -jar $JMXCLIENT $JMXCREDS $JMXHOST:$JMXPORT $JMXOBJECT $JMXATTRIBUTE 2>&1)
 RESULT=${RESULT##*${JMXATTRIBUTE}: }
 
 if [ "$RESULT" = "$EXPECTRESULT" ]; then
