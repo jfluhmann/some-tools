@@ -48,10 +48,6 @@ elif [ ! -e "$NAGIOS_PLUGINS/$JMXCLIENT" ]; then
     echo "and put it in $NAGIOS_PLUGINS (or wherever your Nagios plugins are located, and "
     echo "set NAGIOS_PLUGINS in this script to that directory)"; echo
     exit $STATE_CRITICAL
-else
-    # Not sure what happened
-    echo "Something is awry"
-    exit $STATE_CRITICAL
 fi
 
 usage() {
