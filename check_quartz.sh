@@ -19,8 +19,9 @@ JMXPORT='1099'
 JMXCREDS='-'
 
 JMXCLIENT_VERSION='0.10.3'
-JMXCLIENT="$NAGIOS_PLUGINS/cmdline-jmxclient-${JMXCLIENT_VERSION}.jar"
-JMXCLIENT_URL="http://crawler.archive.org/cmdline-jmxclient/$JMXCLIENT"
+JMXCLIENT_NAME="cmdline-jmxclient-${JMXCLIENT_VERSION}.jar"
+JMXCLIENT_URL="http://crawler.archive.org/cmdline-jmxclient/${JMXCLIENT_NAME}"
+JMXCLIENT="$NAGIOS_PLUGINS/${JMXCLIENT_NAME}"
 GREP=$(which grep)
 ECHO=$(which echo)
 JAVA=$(which java)
@@ -30,28 +31,28 @@ then
     if [ -x "$JAVA_HOME/bin/java" ]; then
         JAVA=$JAVA_HOME/bin/java
     else
-        echo "JMX CRITICAL - java not found."
+        $ECHO "JMX CRITICAL - java not found."
         exit $STATE_CRITICAL
     fi
 fi
 
 # Check for nagios plugins directory and jmxclient
 if [ ! -d "$NAGIOS_PLUGINS" ]; then
-    echo "JMX CRITICAL - $NAGIOS_PLUGINS not found (you may need to set NAGIOS_PLUGIN to appropriate value)"
+    $ECHO "JMX CRITICAL - $NAGIOS_PLUGINS not found (you may need to set NAGIOS_PLUGIN to appropriate value)"
     exit $STATE_CRITICAL
 elif [ ! -e "$JMXCLIENT" ]; then
     #cd $NAGIOS_PLUGINS
     #wget -q $JMXCLIENT_URL
     #curl -O $JMXCLIENT_URL
-    echo; echo "You need to download the jmxclient from $JMXCLIENT_URL"
-    echo "and put it in $NAGIOS_PLUGINS (or wherever your Nagios plugins are located, and "
-    echo "set NAGIOS_PLUGINS in this script to that directory)"; echo
+    $ECHO; $ECHO "You need to download the jmxclient from $JMXCLIENT_URL"
+    $ECHO "and put it in $NAGIOS_PLUGINS (or wherever your Nagios plugins are located, and "
+    $ECHO "set NAGIOS_PLUGINS in this script to that directory)"; $ECHO
     exit $STATE_CRITICAL
 fi
 
 usage() {
-    echo "Usage: ${0##*/} -O <object_name> -A <attribute_name> -R <expected value>"
-    echo "    [-H <host>] [-P <port>] [-u <username>] [-p <password>]"
+    $ECHO "Usage: ${0##*/} -O <object_name> -A <attribute_name> -R <expected value>"
+    $ECHO "    [-H <host>] [-P <port>] [-u <username>] [-p <password>]"
     exit $STATE_OK
 }
 
@@ -75,7 +76,7 @@ done
 [[ "$JMXUSER" ]] && [[ "$JMXPASS" ]] && JMXCREDS="$JMXUSER:$JMXPASS"
 
 # Grab Full Object
-JMXOBJECT=$($JAVA -jar $JMXCLIENT $JMXCREDS $JMXHOST:$JMXPORT 2>&1 | grep $JMXOBJECT)
+JMXOBJECT=$($JAVA -jar $JMXCLIENT $JMXCREDS $JMXHOST:$JMXPORT 2>&1 | $GREP $JMXOBJECT)
 
 RESULT=$($JAVA -jar $JMXCLIENT $JMXCREDS $JMXHOST:$JMXPORT $JMXOBJECT $JMXATTRIBUTE 2>&1)
 RESULT=${RESULT##*${JMXATTRIBUTE}: }
