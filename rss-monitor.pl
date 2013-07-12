@@ -16,6 +16,10 @@ my %services = (
     'Twitter' => {
         'feed' => 'http://status.twitter.com/rss',
         'file' => 'twitter-status.rss',
+    },
+    'Hipchat' => {
+        'feed' => 'http://status.hipchat.com/rss',
+        'file' => 'hipchat-status.rss',
     }
 );
 
