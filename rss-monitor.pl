@@ -97,7 +97,7 @@ sub hipchat_notify {
     my $description = shift;
     my $pubDate     = shift;
     my $color       = 'red';
-    $color = 'green' if $title =~ m/Service is operating normally/ || $description =~ m/(issue has been resolved|service is now operating normally)/;
+    $color = 'green' if $title =~ m/(Service is operating normally|Up)/ || $description =~ m/(issue has been resolved|service is now operating normally)/;
     
     my $message   = "<strong>$pubDate - $service Status Update</strong><br /><strong>Title: </strong>$title<br /><strong>Description: </strong>$description";
     my $hipchat   = WWW::Hipchat::API->new( auth_token => 'HIPCHAT_API_AUTH_TOKEN' );
