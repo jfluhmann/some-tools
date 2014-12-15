@@ -20,6 +20,10 @@ my %services = (
     'Hipchat' => {
         'feed' => 'http://status.hipchat.com/rss',
         'file' => 'hipchat-status.rss',
+     },
+     'Embedly' => {
+         'feed' => 'http://status.embed.ly/rss',
+         'file' => 'embedly-status.rss',
     }
 );
 
